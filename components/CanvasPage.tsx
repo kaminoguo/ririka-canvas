@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import LikeButton from "./LikeButton";
 
 interface DraggableCardProps {
   id: string;
@@ -344,6 +345,12 @@ export default function CanvasPage() {
             viewportOffset={viewport}
           />
         ))}
+
+        {/* Like Button */}
+        <LikeButton
+          initialPosition={{ x: 200, y: 200 }}
+          viewportOffset={viewport}
+        />
       </div>
 
       {/* Controls */}
