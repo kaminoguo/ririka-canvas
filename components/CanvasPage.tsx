@@ -258,6 +258,13 @@ export default function CanvasPage() {
       initialPosition: { x: 900, y: 550 },
       color: "#f87171"
     },
+    {
+      id: "career",
+      type: "skill" as const,
+      content: "DREAM JOB: AI PM / CPO",
+      initialPosition: { x: 500, y: 480 },
+      color: "#a78bfa"
+    },
   ];
 
   // Handle canvas panning
