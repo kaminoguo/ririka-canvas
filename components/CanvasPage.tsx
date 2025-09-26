@@ -229,6 +229,8 @@ export default function CanvasPage() {
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [touchStartDistance, setTouchStartDistance] = useState(0);
+  const [touchStartScale, setTouchStartScale] = useState(1);
 
   const cards = [
     { id: "avatar", type: "avatar" as const, content: "RIRIKA", initialPosition: { x: 400, y: 200 }, color: "#fff" },
@@ -328,6 +330,77 @@ export default function CanvasPage() {
     setIsPanning(false);
   };
 
+  // Handle touch events for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      // Single touch - pan
+      const touch = e.touches[0];
+      if (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-background')) {
+        setIsPanning(true);
+        setPanStart({
+          x: touch.clientX - viewport.x,
+          y: touch.clientY - viewport.y,
+        });
+      }
+    } else if (e.touches.length === 2) {
+      // Two touches - pinch zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+      setTouchStartDistance(distance);
+      setTouchStartScale(viewport.scale);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 1 && isPanning) {
+      // Single touch - pan
+      const touch = e.touches[0];
+      setViewport({
+        ...viewport,
+        x: touch.clientX - panStart.x,
+        y: touch.clientY - panStart.y,
+      });
+    } else if (e.touches.length === 2 && touchStartDistance > 0) {
+      // Two touches - pinch zoom
+      e.preventDefault();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.sqrt(
+        Math.pow(touch2.clientX - touch1.clientX, 2) +
+        Math.pow(touch2.clientY - touch1.clientY, 2)
+      );
+
+      const scale = (distance / touchStartDistance) * touchStartScale;
+      const newScale = Math.min(Math.max(0.5, scale), 3);
+
+      // Zoom towards center of pinch
+      const centerX = (touch1.clientX + touch2.clientX) / 2;
+      const centerY = (touch1.clientY + touch2.clientY) / 2;
+      const rect = canvasRef.current?.getBoundingClientRect();
+
+      if (rect) {
+        const x = centerX - rect.left;
+        const y = centerY - rect.top;
+        const scaleChange = newScale / viewport.scale;
+
+        setViewport({
+          x: x - (x - viewport.x) * scaleChange,
+          y: y - (y - viewport.y) * scaleChange,
+          scale: newScale,
+        });
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsPanning(false);
+    setTouchStartDistance(0);
+  };
+
   // Handle zoom
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -370,6 +443,9 @@ export default function CanvasPage() {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Canvas Container */}
       <div
