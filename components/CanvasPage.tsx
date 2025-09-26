@@ -67,6 +67,19 @@ function DraggableCard({ id, type, content, initialPosition, color, href, icon, 
     });
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    setHasDragged(false);
+    const touch = e.touches[0];
+    const actualX = (initialPosition.x + localOffset.x) * viewportOffset.scale + viewportOffset.x;
+    const actualY = (initialPosition.y + localOffset.y) * viewportOffset.scale + viewportOffset.y;
+    setDragStart({
+      x: touch.clientX - actualX,
+      y: touch.clientY - actualY,
+    });
+  };
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
@@ -80,18 +93,39 @@ function DraggableCard({ id, type, content, initialPosition, color, href, icon, 
       }
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && e.touches.length > 0) {
+        const touch = e.touches[0];
+        const newX = (touch.clientX - dragStart.x - viewportOffset.x) / viewportOffset.scale - initialPosition.x;
+        const newY = (touch.clientY - dragStart.y - viewportOffset.y) / viewportOffset.scale - initialPosition.y;
+        const distance = Math.sqrt(Math.pow(newX - localOffset.x, 2) + Math.pow(newY - localOffset.y, 2));
+        if (distance > 2) {
+          setHasDragged(true);
+        }
+        setLocalOffset({ x: newX, y: newY });
+      }
+    };
+
     const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleTouchEnd = () => {
       setIsDragging(false);
     };
 
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isDragging, dragStart, viewportOffset, initialPosition]);
 
@@ -114,6 +148,7 @@ function DraggableCard({ id, type, content, initialPosition, color, href, icon, 
         animate={{ scale: 1, rotate: 0 }}
         transition={{ delay }}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
       >
         <div
           className="flex flex-col items-center p-4"
@@ -161,6 +196,7 @@ function DraggableCard({ id, type, content, initialPosition, color, href, icon, 
       animate={{ scale: 1, rotate: Math.random() * 6 - 3 }}
       transition={{ delay }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div
         className="px-4 py-3 text-xs flex items-center gap-2"

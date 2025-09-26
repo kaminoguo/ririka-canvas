@@ -111,6 +111,19 @@ export default function LikeButton({ initialPosition, viewportOffset }: LikeButt
     });
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    setHasDragged(false);
+    const touch = e.touches[0];
+    const actualX = (initialPosition.x + localOffset.x) * viewportOffset.scale + viewportOffset.x;
+    const actualY = (initialPosition.y + localOffset.y) * viewportOffset.scale + viewportOffset.y;
+    setDragStart({
+      x: touch.clientX - actualX,
+      y: touch.clientY - actualY,
+    });
+  };
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
@@ -124,18 +137,39 @@ export default function LikeButton({ initialPosition, viewportOffset }: LikeButt
       }
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && e.touches.length > 0) {
+        const touch = e.touches[0];
+        const newX = (touch.clientX - dragStart.x - viewportOffset.x) / viewportOffset.scale - initialPosition.x;
+        const newY = (touch.clientY - dragStart.y - viewportOffset.y) / viewportOffset.scale - initialPosition.y;
+        const distance = Math.sqrt(Math.pow(newX - localOffset.x, 2) + Math.pow(newY - localOffset.y, 2));
+        if (distance > 2) {
+          setHasDragged(true);
+        }
+        setLocalOffset({ x: newX, y: newY });
+      }
+    };
+
     const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleTouchEnd = () => {
       setIsDragging(false);
     };
 
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isDragging, dragStart, viewportOffset, initialPosition, localOffset]);
 
@@ -158,6 +192,7 @@ export default function LikeButton({ initialPosition, viewportOffset }: LikeButt
       animate={{ scale: 1 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div
         className={`relative px-6 py-4 text-center ${hasLiked ? 'cursor-not-allowed' : 'hover:scale-105'} transition-transform`}
