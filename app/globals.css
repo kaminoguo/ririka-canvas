@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #8b956d;
+  --foreground: #1e1e1e;
+  --pixel-green: #4ade80;
+  --pixel-dark: #22c55e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+  color: var(--foreground);
+  font-family: 'Press Start 2P', 'ZCOOL QingKe HuangYou', cursive;
+  overflow: hidden;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  cursor: grab;
+}
+
+.canvas-container:active {
+  cursor: grabbing;
+}
+
+.draggable-element {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  transition: transform 0.1s ease-out;
+}
+
+.draggable-element:active {
+  cursor: grabbing;
+  z-index: 1000;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+.pixel-border {
+  border: 4px solid #000;
+  background: #fff;
+  box-shadow:
+    0 0 0 4px #000,
+    0 0 0 8px #fff,
+    0 0 0 12px #000;
+}
+
+.pixel-button {
+  background: var(--pixel-green);
+  border: 4px solid #000;
+  color: #000;
+  padding: 12px 24px;
+  font-size: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-button:hover {
+  background: #86efac;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #000;
+}
+
+.pixel-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #000;
+}
