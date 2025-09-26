@@ -8,6 +8,55 @@ interface LikeButtonProps {
   viewportOffset: { x: number; y: number; scale: number };
 }
 
+// Pixel heart SVG component
+const PixelHeart = ({ filled }: { filled: boolean }) => (
+  <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+    {filled ? (
+      // Filled heart
+      <>
+        <rect x="3" y="2" width="3" height="1" fill="#ff1744"/>
+        <rect x="10" y="2" width="3" height="1" fill="#ff1744"/>
+        <rect x="2" y="3" width="5" height="1" fill="#ff1744"/>
+        <rect x="9" y="3" width="5" height="1" fill="#ff1744"/>
+        <rect x="1" y="4" width="6" height="3" fill="#ff1744"/>
+        <rect x="9" y="4" width="6" height="3" fill="#ff1744"/>
+        <rect x="2" y="7" width="12" height="1" fill="#ff1744"/>
+        <rect x="3" y="8" width="10" height="1" fill="#ff1744"/>
+        <rect x="4" y="9" width="8" height="1" fill="#ff1744"/>
+        <rect x="5" y="10" width="6" height="1" fill="#ff1744"/>
+        <rect x="6" y="11" width="4" height="1" fill="#ff1744"/>
+        <rect x="7" y="12" width="2" height="1" fill="#ff1744"/>
+        <rect x="8" y="13" width="1" height="1" fill="#ff1744"/>
+      </>
+    ) : (
+      // Empty heart outline
+      <>
+        <rect x="3" y="2" width="3" height="1" fill="#000"/>
+        <rect x="10" y="2" width="3" height="1" fill="#000"/>
+        <rect x="2" y="3" width="1" height="1" fill="#000"/>
+        <rect x="6" y="3" width="1" height="1" fill="#000"/>
+        <rect x="9" y="3" width="1" height="1" fill="#000"/>
+        <rect x="13" y="3" width="1" height="1" fill="#000"/>
+        <rect x="1" y="4" width="1" height="3" fill="#000"/>
+        <rect x="7" y="4" width="2" height="1" fill="#000"/>
+        <rect x="14" y="4" width="1" height="3" fill="#000"/>
+        <rect x="2" y="7" width="1" height="1" fill="#000"/>
+        <rect x="13" y="7" width="1" height="1" fill="#000"/>
+        <rect x="3" y="8" width="1" height="1" fill="#000"/>
+        <rect x="12" y="8" width="1" height="1" fill="#000"/>
+        <rect x="4" y="9" width="1" height="1" fill="#000"/>
+        <rect x="11" y="9" width="1" height="1" fill="#000"/>
+        <rect x="5" y="10" width="1" height="1" fill="#000"/>
+        <rect x="10" y="10" width="1" height="1" fill="#000"/>
+        <rect x="6" y="11" width="1" height="1" fill="#000"/>
+        <rect x="9" y="11" width="1" height="1" fill="#000"/>
+        <rect x="7" y="12" width="2" height="1" fill="#000"/>
+        <rect x="8" y="13" width="1" height="1" fill="#000"/>
+      </>
+    )}
+  </svg>
+);
+
 export default function LikeButton({ initialPosition, viewportOffset }: LikeButtonProps) {
   const [likes, setLikes] = useState<number>(0);
   const [hasLiked, setHasLiked] = useState(false);
@@ -120,9 +169,9 @@ export default function LikeButton({ initialPosition, viewportOffset }: LikeButt
         }}
         onClick={handleLike}
       >
-        {/* Heart Icon */}
-        <div className={`text-2xl mb-2 ${isAnimating ? 'animate-bounce' : ''}`}>
-          {hasLiked ? '💖' : '🤍'}
+        {/* Pixel Heart Icon */}
+        <div className={`mb-2 flex justify-center ${isAnimating ? 'animate-bounce' : ''}`}>
+          <PixelHeart filled={hasLiked} />
         </div>
 
         {/* Like Count */}
@@ -130,28 +179,41 @@ export default function LikeButton({ initialPosition, viewportOffset }: LikeButt
           {likes} LIKES
         </div>
 
-        {/* Floating hearts animation */}
+        {/* Floating pixel hearts animation */}
         {isAnimating && (
           <>
-            {[...Array(5)].map((_, i) => (
+            {[...Array(3)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute text-lg"
+                className="absolute pointer-events-none"
+                style={{ left: '40%' }}
                 initial={{
-                  x: Math.random() * 40 - 20,
+                  x: Math.random() * 20 - 10,
                   y: 0,
                   opacity: 1
                 }}
                 animate={{
-                  y: -100,
+                  y: -60,
                   opacity: 0
                 }}
                 transition={{
-                  duration: 1,
-                  delay: i * 0.1
+                  duration: 0.8,
+                  delay: i * 0.15
                 }}
               >
-                ❤️
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="3" y="2" width="3" height="1" fill="#ff1744"/>
+                  <rect x="10" y="2" width="3" height="1" fill="#ff1744"/>
+                  <rect x="2" y="3" width="5" height="1" fill="#ff1744"/>
+                  <rect x="9" y="3" width="5" height="1" fill="#ff1744"/>
+                  <rect x="1" y="4" width="14" height="3" fill="#ff1744"/>
+                  <rect x="2" y="7" width="12" height="1" fill="#ff1744"/>
+                  <rect x="3" y="8" width="10" height="1" fill="#ff1744"/>
+                  <rect x="4" y="9" width="8" height="1" fill="#ff1744"/>
+                  <rect x="5" y="10" width="6" height="1" fill="#ff1744"/>
+                  <rect x="6" y="11" width="4" height="1" fill="#ff1744"/>
+                  <rect x="7" y="12" width="2" height="1" fill="#ff1744"/>
+                </svg>
               </motion.div>
             ))}
           </>
